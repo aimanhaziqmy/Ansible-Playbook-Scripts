@@ -1,0 +1,30 @@
+
+---
+- name : Install required packages
+  hosts : all
+  become : true
+  tasks :
+   - name : Install Docker
+     apt :
+      name : docker.io
+      state : present
+
+   - name : Install MariaDB
+     apt :
+      name : mariadb-server
+      state : present
+
+   - name : Install Vim
+     apt :
+      name : vim
+      state : present
+
+   - name : Install openssh-server
+     apt :
+      name : openssh-server
+      state : present
+
+   - name : Install git
+     apt :
+      name : git
+      state : present
