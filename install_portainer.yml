@@ -3,7 +3,7 @@
   tasks :
 
   - name : Create new volume 
-    community.docker.docker_volume:
+    community.docker.docker_volume :
       name : portainer_data
 
   - name : Deploy Portainer

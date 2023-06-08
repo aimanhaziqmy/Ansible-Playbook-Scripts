@@ -1,0 +1,10 @@
+---
+- name : Stop Apache
+  hosts : all
+  become : true
+  become_method : sudo
+  tasks : 
+   - name : Stop Apache Service
+     service :
+       name : apache2
+       state : stopped
