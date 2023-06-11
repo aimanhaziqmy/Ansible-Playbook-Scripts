@@ -1,0 +1,16 @@
+---
+- name: Install node_exporter and open firewall for node exporter
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install Prometheus node_exporter
+      apt:
+        name: prometheus-node-exporter
+        state: present
+
+    - name: Open firewall for node_exporter
+      ufw:
+        rule: allow
+        port: 9100
+        comment: Allow node_exporter
+

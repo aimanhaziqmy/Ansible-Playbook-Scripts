@@ -1,0 +1,38 @@
+---
+- name: Install and configure Node Exporter
+  hosts: all
+  become: true
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Install Docker Compose
+      apt:
+        name: docker-compose
+        state: present
+        update_cache: yes
+
+    - name: Create directory for Node Exporter
+      file:
+        path: /opt/node_exporter
+        state: directory
+        mode: 0755
+
+    - name: Download docker-compose.yml
+      get_url:
+        url: https://raw.githubusercontent.com/prometheus/node_exporter/master/docker/docker-compose.yml
+        dest: /opt/node_exporter/docker-compose.yml
+
+    - name: Start Node Exporter container
+      command: docker-compose -f /opt/node_exporter/docker-compose.yml up -d
+
+    - name: Open firewall for Node Exporter
+      ufw:
+        rule: allow
+        port: 9100
+        proto: tcp
+        state: enabled
+
