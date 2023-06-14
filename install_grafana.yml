@@ -1,0 +1,35 @@
+---
+- name: Install Grafana using Docker
+  hosts: grafana
+  become: true
+  tasks:
+    - name: Install Docker Python library
+      pip:
+        name: docker
+
+    - name: Start Grafana container
+      docker_container:
+        name: grafana
+        image: grafana/grafana-enterprise
+        restart_policy: always
+        ports:
+          - "3000:3000"
+        volumes:
+          - /var/lib/grafana:/var/lib/grafana
+        env:
+          GF_SECURITY_ADMIN_USER: admin
+          GF_SECURITY_ADMIN_PASSWORD: admin
+      register: grafana_container
+
+    - name: Wait for Grafana to be reachable
+      wait_for:
+        host: localhost
+        port: 3000
+        delay: 10
+        timeout: 60
+    
+    - name: Allow incoming connections on port 3000 for grafana
+      become: true
+      ufw:
+        rule: allow
+        port: 3000

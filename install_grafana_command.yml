@@ -1,0 +1,12 @@
+---
+- name : Install Grafana
+  hosts: grafana
+  tasks:
+   - name: Start Grafana container
+     become: true
+     command: docker run -d -p 3000:3000 --name=grafana grafana/grafana-enterprise
+   - name : Allow incoming connections on port 3000
+     become: true
+     ufw:
+       rule: allow
+       port: 3000
