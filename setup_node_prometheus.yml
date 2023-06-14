@@ -1,0 +1,82 @@
+---
+- name: Setup Prometheus and Node Exporter
+  hosts: Prometheus
+  vars:
+    prometheus_server_ip: "{{ inventory_hostname }}"
+
+  tasks:
+    - name: Install docker
+      apt:
+        name: docker.io
+        state: present
+    - name: Install docker compose
+      apt:
+        name: docker-compose
+        state: present
+    - name: Create Prometheus directory
+      become: true
+      file:
+        path: ~/Prometheus
+        state: directory
+
+    - name: Copy prometheus.yml configuration file
+      become: true
+      template:
+        src: ~/ansible_server/prometheus.yml.j2
+        dest: ~/Prometheus/prometheus.yml
+
+    - name: Install and run Node Exporter using Docker
+      become: true
+      docker_container:
+        name: node_exporter
+        image: prom/node-exporter
+        restart_policy: always
+        ports:
+          - "9100:9100"
+
+    - name: Install and run Prometheus using Docker
+      become: true
+      docker_container:
+        name: prometheus
+        image: prom/prometheus
+        restart_policy: always
+        ports:
+          - "9090:9090"
+        volumes:
+          - ~/Prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+    - name: Allow incoming connections on port 9100 for Node Exporter
+      become: true
+      ufw:
+        rule: allow
+        port: 9100
+
+    - name: Allow incoming connections on port 9090 for Prometheus
+      become: true
+      ufw:
+        rule: allow
+        port: 9090
+
+    - name: Allow incoming connections on port 22 for SSH
+      become: true
+      ufw:
+        rule: allow
+        port: 22
+    
+    - name: Allow incoming connections on port 80 for HTTP
+      become: true
+      ufw:
+        rule: allow
+        port: 80
+
+    - name: Allow incoming connections on port 443 for HTTPS
+      become: true
+      ufw:
+        rule: allow
+        port: 443
+
+    - name: Enable UFW
+      ufw:
+        state: enabled
+        sudo: yes
+
