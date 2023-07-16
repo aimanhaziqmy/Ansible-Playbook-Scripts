@@ -34,6 +34,21 @@
         ports:
           - "9100:9100"
 
+    - name: Pull FastAPI example docker image
+      become: true
+      docker_image:
+        name: asdkant/fastapi-hello-world
+        source: pull
+
+    - name: Install and run python fastapi installation
+      become: true
+      docker_container:
+        name: fastapi_example
+        image: asdkant/fastapi-hello-world
+        restart_policy: always
+        ports:
+          - "9900:80"
+
     - name: Install and run Prometheus using Docker
       become: true
       docker_container:
@@ -74,6 +89,12 @@
       ufw:
         rule: allow
         port: 443
+
+    - name: Allow incoming connections on port 9900 for fastapi example
+      become: true
+      ufw:
+        rule: allow
+        port: 9900
 
     - name: Enable UFW
       ufw:
