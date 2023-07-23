@@ -1,0 +1,26 @@
+---
+- name: Clone Docker image from GitHub
+  hosts: all
+  tasks:
+    - name: Clone GitHub repository
+      git:
+        repo: git@github.com:tasha9709/DR-Severity-Multiclass-Prediction.git
+        dest: ~/dr_prediction
+        clone: yes
+        update: yes
+
+    - name: Build Docker image
+      docker_image:
+        name: dr_prediction
+        source: build
+        build:
+          path: ~/dr_prediction
+        tag: v1
+
+    - name: Run Docker container
+      docker_container:
+        name: dr_prediction
+        image: dr_prediction:v1
+        ports:
+          - "5000:80"
+        restart_policy: unless-stopped
