@@ -1,0 +1,55 @@
+---
+- name: Install n8n.io via Docker on Ubuntu
+  hosts: all  # Replace with your server's hostname or IP
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: Install required packages
+      apt:
+        name: ['apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common']
+
+    - name: Allow the connection to port 5678
+      ufw:
+        rule: allow
+        port: "5678"
+        comment: "Allow n8 incoming traffic"
+
+    - name: Create n8n data directory
+      file:
+        path: /var/n8n_data
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+
+    - name: Create n8n docker-compose file
+      template:
+        src: docker-compose.yml.j2
+        dest: /var/n8n_data/docker-compose.yml
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0644'
+
+    - name: Start n8n container
+      command: docker-compose -f /var/n8n_data/docker-compose.yml up -d
+      environment:
+        COMPOSE_HTTP_TIMEOUT: '300'
+      args:
+        chdir: /var/n8n_data
+      ignore_errors: yes
+      register: n8n_start_result
+
+    - name: Check n8n container status
+      command: docker ps -f name=n8n
+      register: n8n_status
+      failed_when: n8n_status.rc != 0 and n8n_status.rc != 1
+
+    - name: Show n8n container status
+      debug:
+        var: n8n_status.stdout_lines
+
+    - name: Check if n8n container started successfully
+      debug:
+        msg: "n8n container is up and running!"
+      when: "'Up' in n8n_status.stdout"

@@ -1,0 +1,67 @@
+---
+- name: Install Node Exporter
+  hosts: nodocker
+  become: yes
+
+  tasks:
+    - name: Download Node Exporter
+      get_url:
+        url: "https://github.com/prometheus/node_exporter/releases/download/v1.2.2/node_exporter-1.2.2.linux-amd64.tar.gz"
+        dest: /tmp/node_exporter-1.2.2.linux-amd64.tar.gz
+
+    - name: Extract Node Exporter archive
+      become: yes
+      unarchive:
+        src: /tmp/node_exporter-1.2.2.linux-amd64.tar.gz
+        dest: /opt
+        remote_src: yes
+        creates: /opt/node_exporter-1.2.2.linux-amd64
+
+    - name: Create a symbolic link
+      become: yes
+      file:
+        src: /opt/node_exporter-1.2.2.linux-amd64
+        dest: /opt/node_exporter
+        state: link
+
+    - name: Create Node Exporter systemd service
+      become: yes
+      copy:
+        content: |
+          [Unit]
+          Description=Node Exporter
+          After=network.target
+
+          [Service]
+          User=node_exporter
+          Group=node_exporter
+          Type=simple
+          ExecStart=/opt/node_exporter/node_exporter
+
+          [Install]
+          WantedBy=multi-user.target
+        dest: /etc/systemd/system/node_exporter.service
+
+    - name: Reload systemd
+      become: yes
+      systemd:
+        name: node_exporter
+        daemon_reload: yes
+        enabled: yes
+        state: started
+
+    - name: Start Node Exporter
+      become: yes
+      service:
+        name: node_exporter
+        state: started
+        enabled: yes
+
+    - name: Allow UFW 9100
+      ufw:
+        rule: allow
+        port: 9100
+    - name: Allow UFW 9001
+      ufw:
+        rule: allow
+        port: 9001

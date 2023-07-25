@@ -1,0 +1,33 @@
+---
+- name: Run Node-RED Docker container
+  hosts: all
+  become: true
+  vars:
+    node_red_username: admin
+    node_red_password_hash: $2a$12$ACsftvv/Mv5tKu4ZKihMI.1ZGSwG1ITrX9sgorOKnciK6qyGH25Ka
+
+  tasks:
+    - name: Pull the Node-RED Docker image
+      docker_image:
+        name: nodered/node-red
+        source: pull
+
+    - name: Create a named volume for Node-RED data
+      docker_volume:
+        name: node_red_data
+
+    - name: Run the Node-RED Docker container
+      docker_container:
+        name: mynodered
+        image: nodered/node-red
+        ports:
+          - "1880:1880"
+        volumes:
+          - "node_red_data:/data"
+        detach: yes
+        interactive: yes
+        tty: yes
+        env: 
+          NODE_RED_USERNAME: "{{node_red_username}}"
+          NODE_RED_PASSWORD: "{{node_red_password_hash}}"
+

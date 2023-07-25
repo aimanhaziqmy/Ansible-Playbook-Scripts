@@ -1,16 +1,48 @@
 ---
-- name: Install node_exporter and open firewall for node exporter
-  hosts: all
-  become: yes
-  tasks:
-    - name: Install Prometheus node_exporter
-      apt:
-        name: prometheus-node-exporter
-        state: present
+- name: Install and Deploy Node Exporter
+  hosts: nodocker
+  become: true
 
-    - name: Open firewall for node_exporter
-      ufw:
-        rule: allow
-        port: 9100
-        comment: Allow node_exporter
+  tasks:
+    - name: Install required dependencies
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - curl
+
+    - name: Download Node Exporter
+      get_url:
+        url: "https://github.com/prometheus/node_exporter/releases/download/v1.2.2/node_exporter-1.2.2.linux-amd64.tar.gz"
+        dest: /tmp/node_exporter.tar.gz
+
+    - name: Extract Node Exporter archive
+      become: true
+      unarchive:
+        src: /tmp/node_exporter.tar.gz
+        dest: /tmp
+        remote_src: yes
+
+    - name: Move Node Exporter binary
+      become: true
+      command: mv /tmp/node_exporter-1.2.2.linux-amd64/node_exporter /usr/local/bin/
+
+    - name: Create Node Exporter user
+      user:
+        name: node_exporter
+        system: yes
+        shell: /bin/false
+
+    - name: Create Node Exporter service file
+      template:
+        src: node_exporter.service.j2
+        dest: /etc/systemd/system/node_exporter.service
+      notify: Restart Node Exporter
+
+  handlers:
+    - name: Restart Node Exporter
+      become: true
+      service:
+        name: node_exporter
+        state: restarted
 
