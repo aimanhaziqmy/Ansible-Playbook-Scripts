@@ -1,5 +1,5 @@
 ---
-- hosts : all
+- hosts : nodocker
   tasks :
 
   - name : Create new volume 
