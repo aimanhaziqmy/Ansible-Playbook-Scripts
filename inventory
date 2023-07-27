@@ -8,4 +8,4 @@
 139.177.184.167 ansible_ssh_user='root'
 
 [nodocker]
-172.104.54.222 ansible_ssh_user='root'
+172.104.63.127 ansible_ssh_user='root'
