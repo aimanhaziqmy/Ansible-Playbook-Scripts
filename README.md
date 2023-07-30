@@ -1,7 +1,7 @@
 # ansible_server
 
 
-Included 
+Included installation for ubuntu server 20.04 : 
 1. Apache installation
 2. Docker installation
 3. Node_exporter_prometheus installation
