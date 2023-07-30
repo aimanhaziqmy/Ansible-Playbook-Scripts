@@ -1,0 +1,29 @@
+version: '2'
+services:
+  controller:
+    image: "openwhisk/controller:latest"
+    ports:
+      - "1000:8080"
+    networks:
+      - openwhisk
+
+  invoker:
+    image: "openwhisk/invoker:latest"
+    ports:
+      - "8080:8080"
+    networks:
+      - openwhisk
+
+  couchdb:
+    image: "apache/couchdb:2.3.1"
+    ports:
+      - "5984:5984"
+    networks:
+      - openwhisk
+    environment:
+      COUCHDB_USER: "whisk_admin"
+      COUCHDB_PASSWORD: "some_secret"
+
+networks:
+  openwhisk:
+    driver: bridge

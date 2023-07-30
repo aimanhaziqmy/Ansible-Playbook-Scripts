@@ -1,0 +1,42 @@
+---
+- name: Install Apache OpenWhisk on Docker
+  hosts: all
+  become: true
+  vars:
+    java_version: "11"  # Change this to the desired Java version
+  tasks:
+    - name: Install required packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - git
+        - docker.io
+        - python3-pip
+        - openjdk-{{ java_version }}-jdk  # Install Java
+
+    - name: Set JAVA_HOME environment variable
+      lineinfile:
+        path: /etc/environment
+        regexp: '^JAVA_HOME='
+        line: 'JAVA_HOME="/usr/lib/jvm/java-{{ java_version }}-openjdk-amd64"'  # Set the correct path based on the Java version installed
+        state: present
+
+    - name: Add Java to the PATH
+      lineinfile:
+        path: /etc/environment
+        regexp: '^PATH='
+        line: 'PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:$JAVA_HOME/bin"'
+        state: present
+        create: yes
+        insertbefore: EOF
+
+    - name: Clone OpenWhisk repository
+      git:
+        repo: https://github.com/apache/openwhisk.git
+        dest: /opt/openwhisk
+
+    - name: Build OpenWhisk images
+      shell: "./gradlew distDocker -PdockerImagePrefix=whisk"
+      args:
+        chdir: /opt/openwhisk

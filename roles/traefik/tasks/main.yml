@@ -1,0 +1,63 @@
+- name: create docker insecure(http) network
+  docker_network:
+    name: web
+
+- name: create docker secure(https) networks
+  docker_network:
+    name: websecure
+
+- name: create traefik directory
+  file:
+    path: "/root/traefik-by-Ansible"
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+    state: directory
+    mode: '0755'
+
+- name: copy traefik.yml
+  copy:
+    src: './traefik.yml'
+    dest: "~/traefik-by-Ansible/traefik.yml"
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+    mode: '0644'
+
+- name: Read Label
+  set_fact:
+    label_file_content: "{{ lookup('file' , label_file) | default({}) | from_yaml }}"
+
+- name: Display file content
+  debug: 
+    var: label_file_content
+
+- name: Pull and start Traefik container
+  docker_container:
+    image: traefik:v2.8
+    name: traefik
+    networks:
+      - name: websecure
+      - name: web
+    state: started
+    restart_policy: on-failure
+    restart_retries: 7
+    ports: 
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/home/{{ansible_ssh_user}}/traefik-by-Ansible/traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/home/{{ansible_ssh_user}}/traefik-by-Ansible/sslcert:/letsencrypt"
+    labels: "{{ label_file_content }}"
+
+- name: Allow access to tcp port 80
+  ufw: 
+    rule: allow
+    port: '80'
+    proto: tcp
+
+- name: Allow access to tcp port 443
+  ufw: 
+    rule: allow
+    port: '443'
+    proto: tcp
+

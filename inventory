@@ -7,5 +7,8 @@
 [grafana]
 139.177.184.167 ansible_ssh_user='root'
 
+[traefik]
+139.177.184.167 ansible_ssh_user='root' label_file="me_label.yml"
+
 [nodocker]
 172.104.63.127 ansible_ssh_user='root'

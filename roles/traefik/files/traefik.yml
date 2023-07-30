@@ -1,0 +1,41 @@
+#log:
+# level: Debug
+
+global: 
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+#Docker configuration backend
+providers:
+  docker:
+    watch: true
+
+#API and dashboard configuration
+api:
+  dashboard: true
+
+entrypoints:
+  web:
+    address: :80
+    http:
+      redirections:
+        entryPoints:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: :443
+    forwardedHeaders: 
+      trustedIPs:
+        - "127.0.0.1/32"
+        - "10.0.0.0/8"
+        - "192.168.0.0/16"
+        - "172.17.0.0/12"
+
+certificatesresolvers:
+  letresolve:
+    acme:
+      email: aimanhaziqyazik@gmail.com
+      storage: /letsencrypt/acme.json
+      dnschallenges: 
+        provider: linode

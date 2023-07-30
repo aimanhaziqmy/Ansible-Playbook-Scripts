@@ -1,0 +1,39 @@
+---
+- name: Install Apache OpenWhisk on Docker
+  hosts: all
+  become: true
+  tasks:
+    - name: Install required packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - git
+        - docker.io
+        - python3-pip
+
+    - name: Install Docker Python library
+      pip:
+        name: docker
+
+    - name: Pull OpenWhisk Docker images
+      docker_image:
+        name: openwhisk/dockerskeleton
+        state: present
+        source: pull
+
+    - name: Create a named volume for Node-RED data
+      docker_volume:
+        name: openwhisk_data
+
+    - name: Run the OpenWhisk Docker container
+      docker_container:
+        name: openwhisk
+        image: openwhisk/dockerskeleton
+        ports:
+          - "1000:1000"
+        volumes:
+          - "openwhisk_data:/data"
+        detach: yes
+        interactive: yes
+        tty: yes

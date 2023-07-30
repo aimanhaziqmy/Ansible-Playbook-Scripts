@@ -1,0 +1,6 @@
+traefik.http.routers.traefik.entrypoints: "websecure"
+traefik.http.routers.traefik.tls: "true"
+traefik.http.routers.traefik.tls.certresolver: "letresolve"
+traefik.http.routers.traefik.tls.domains[0].main: "me.scriptertechnology.com"
+traefik.http.routers.traefik.tls.domains[0].sans: "*.me.scriptertechnology.com"
+
