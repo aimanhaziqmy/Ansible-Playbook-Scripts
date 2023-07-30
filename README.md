@@ -15,3 +15,5 @@ Included installation for ubuntu server 20.04 :
 11. Grafana
 12. Traefik
 13. OpenWhisk
+14. NodeRed
+15. n8n.io
