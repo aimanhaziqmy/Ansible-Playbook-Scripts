@@ -10,3 +10,8 @@ Included
 6. Remove apache
 7. Startup (testing)
 8. Installing wordpress
+9. Node Exporter
+10. Prometheus
+11. Grafana
+12. Traefik
+13. OpenWhisk
