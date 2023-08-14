@@ -1,0 +1,8 @@
+---
+- hosts: Prometheus
+  become: true
+  vars:
+    prometheus_server_ip: "{{ inventory_hostname }}"
+  roles:
+    - prometheus
+

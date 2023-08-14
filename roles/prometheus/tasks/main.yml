@@ -1,0 +1,58 @@
+- name: Create Prometheus directory
+  become: true
+  file:
+    path: ~/Prometheus
+    state: directory
+
+- name: Copy prometheus.yml configuration file
+  become: true
+  template:
+    src:  prometheus.yml.j2
+    dest: ~/Prometheus/prometheus.yml
+
+- name: Install and run Node Exporter using Docker
+  become: true
+  docker_container:
+    name: node_exporter
+    image: prom/node-exporter
+    restart_policy: always
+    ports:
+      - "9100:9100"
+
+- name: Install and run cAdvisor using Docker
+  become: true
+  docker_container:
+    name: cadvisor
+    image: google/cadvisor
+    restart_policy: always
+    ports: 
+      - "8080:8080"
+
+- name: Install and run Prometheus using Docker
+  become: true
+  docker_container:
+    name: prometheus
+    image: prom/prometheus
+    restart_policy: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ~/Prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+- name: Allow incoming connections on port 9100 for Node Exporter
+  become: true
+  ufw:
+    rule: allow
+    port: 9100
+
+- name: Allow incoming connections on port 9090 for Prometheus
+  become: true
+  ufw:
+    rule: allow
+    port: 9090
+
+- name: Allow incoming connections on port 8080 for cAdvisor
+  become: true
+  ufw:
+    rule: allow
+    port: 8080
