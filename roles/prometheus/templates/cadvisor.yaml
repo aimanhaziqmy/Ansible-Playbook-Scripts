@@ -1,0 +1,46 @@
+# cadvisor.yaml
+
+# Specify the list of containers to monitor (replace with your container names)
+containers:
+  - "/"
+  - "/your-container-name"
+
+# Specify the collection interval (in seconds)
+housekeeping_interval: 10
+
+# Set the global CPU limit (percentage)
+global_housekeeping_cpu_limit: 5
+
+# Set the global memory limit (in bytes)
+global_housekeeping_memory_limit: 50MB
+
+# Set the global filesystem limit (in bytes)
+global_housekeeping_fs_limit: 100MB
+
+# Configure metrics to collect (only CPU, memory, storage, and network)
+num_stats_per_sample: 1
+disable_metrics:
+  - "container/filesystem"
+  - "container/diskio"
+  - "container/tasks"
+  - "container/volume"
+  - "container/hugetlb"
+  - "container/process"
+  - "container/cpu/online_cpus"
+  - "container/cpu/cfs_throttled_periods"
+  - "container/cpu/cfs_throttled_time"
+  - "container/memory/page_faults"
+  - "container/memory/page_faults_min"
+  - "container/memory/page_faults_maj"
+  - "container/memory/rss_huge"
+  - "container/memory/hierarchical_memory_limit"
+  - "container/memory/hierarchical_memsw_limit"
+  - "container/memory/hierarchical_memory_usage"
+  - "container/memory/hierarchical_memsw_usage"
+  - "container/fs"
+
+# Enable or disable container metadata collection
+enable_container_metadata: true
+
+# Enable or disable Docker metadata collection
+enable_docker_metadata: true

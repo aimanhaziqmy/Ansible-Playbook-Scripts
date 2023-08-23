@@ -17,16 +17,20 @@
     image: prom/node-exporter
     restart_policy: always
     ports:
-      - "9100:9100"
+      - "9200:9100"
+
+- name: Copy cadvisor.yaml configuration file
+  become: true
+  template:
+    src: docker-compose.yml
+    dest: ~/Prometheus/docker-compose.yml
 
 - name: Install and run cAdvisor using Docker
-  become: true
-  docker_container:
-    name: cadvisor
-    image: google/cadvisor
-    restart_policy: always
-    ports: 
-      - "8080:8080"
+  become: false
+  community.docker.docker_compose:
+    project_src: ~/Prometheus
+    files:
+      - docker-compose.yml
 
 - name: Install and run Prometheus using Docker
   become: true
@@ -38,6 +42,13 @@
       - "9090:9090"
     volumes:
       - ~/Prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+- name: Update Prometheus configuration
+  lineinfile:
+    path: ~/Prometheus/prometheus.yml
+    line: "  - job_name : 'cadvisor'"
+    insertafter: "^scrape_configs:"
+  notify: restart prometheus
 
 - name: Allow incoming connections on port 9100 for Node Exporter
   become: true
@@ -55,4 +66,4 @@
   become: true
   ufw:
     rule: allow
-    port: 8080
+    port: 8090

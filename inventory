@@ -2,7 +2,7 @@
 139.177.184.167 ansible_ssh_user='root'
 
 [Prometheus]
-139.177.184.167 ansible_ssh_user='root'
+139.177.184.167 ansible_ssh_user='root' prometheus_server_ip='139.177.184.167'
 
 [grafana]
 139.177.184.167 ansible_ssh_user='root'
@@ -12,3 +12,6 @@
 
 [nodocker]
 172.104.34.239 ansible_ssh_user='root'
+
+[arbatravel]
+139.144.117.220 ansible_ssh_user='root'

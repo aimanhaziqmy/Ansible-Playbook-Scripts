@@ -1,0 +1,33 @@
+---
+- name: Deploy cAdvisor container
+  hosts: all
+  tasks:
+    - name: Pull cAdvisor image
+      docker_image:
+        name: google/cadvisor:latest
+        source: pull
+
+    - name: Create cAdvisor container
+      docker_container:
+        name: cadvisor
+        image: google/cadvisor:latest
+        restart_policy: unless-stopped
+        volumes:
+          - "/:/rootfs:ro"
+          - "/var/run:/var/run:rw"
+          - "/sys:/sys:ro"
+          - "/var/lib/docker/:/var/lib/docker:ro"
+        command:
+          - '-housekeeping_interval=55s'
+          - '-docker_only=true'
+          - '--disable_metrics=disk,tcp,udp,percpu,sched,process'
+          - '-allow_dynamic_housekeeping=false'
+          - '--store_container_labels=false'
+          - '--event_storage_event_limit=default=0'
+          - '--event_storage_age_limit=default=0'
+          - '--global_housekeeping_interval=55s'
+          - '--storage_duration=1m0s'
+        security_opts:
+          - no-new-privileges:true
+        ports:
+          - "8090:8080"

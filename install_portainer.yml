@@ -1,5 +1,5 @@
 ---
-- hosts : nodocker
+- hosts : arbatravel
   tasks :
 
   - name : Create new volume 

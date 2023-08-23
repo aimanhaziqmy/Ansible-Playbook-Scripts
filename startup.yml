@@ -1,7 +1,7 @@
 
 ---
 - name : Install required packages
-  hosts : all
+  hosts : arbatravel
   become : true
   tasks :
    - name : Install Docker
