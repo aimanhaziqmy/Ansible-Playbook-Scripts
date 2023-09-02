@@ -15,3 +15,8 @@
 
 [arbatravel]
 139.144.117.220 ansible_ssh_user='root'
+
+[general]
+139.177.184.167
+139.144.117.220
+

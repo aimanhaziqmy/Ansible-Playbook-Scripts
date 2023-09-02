@@ -5,8 +5,8 @@
   become: yes
 
   vars:
-    n8n_username: hi@arbatravel.com
-    n8n_password: Halaltourism2015
+    n8n_username: ***
+    n8n_password: ***
 
   tasks:
     - name: Pull n8n Docker image
