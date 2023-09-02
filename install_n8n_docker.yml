@@ -1,12 +1,12 @@
 ---
 - name: Pull and run n8n Docker container
-  hosts: all
+  hosts: arbatravel
   gather_facts: yes
   become: yes
 
   vars:
-    n8n_username: admin
-    n8n_password: admin
+    n8n_username: hi@arbatravel.com
+    n8n_password: Halaltourism2015
 
   tasks:
     - name: Pull n8n Docker image

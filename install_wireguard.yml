@@ -45,6 +45,34 @@
           - "net.ipv4.conf.all.src_valid_mark=1"
         restart_policy: unless-stopped
    
+    - name: Deploy wireguard-ui container
+      docker_container:
+        name: wireguard-ui
+        image: ngoduykhanh/wireguard-ui:latest
+        state: started
+        restart_policy: unless-stopped
+        cap_add: 
+          - NET_ADMIN
+        ports:
+          - "5000:5000"
+        env:
+          SENDGRID_API_KEY: ''
+          EMAIL_FROM_ADDRESS: ''
+          EMAIL_FROM_NAME: ''
+          SESSION_SECRET: ''
+          WGUI_USERNAME: admin
+          WGUI_PASSWORD: admin
+          WG_CONF_TEMPLATE: ''
+          WGUI_MANAGE_START: 'true'
+          WGUI_MANAGE_RESTART: 'true'
+        log_driver: json-file
+        log_options: 
+          max-size: "50m"
+        network_mode: "web"
+        volumes: 
+          - /opt/wireguard-server/db:/app/db
+          - /opt/wireguard-server/config:/etc/wireguard
+
     - name: Allow port 51820 in UFW
       ufw:
         rule: allow
@@ -52,3 +80,14 @@
         proto: udp
       become: yes
 
+    - name: Allow port 9000
+      ufw:
+        rule: allow
+        port: 9000
+      become: yes
+    
+    - name: Allow port 5000
+      ufw: 
+        rule: allow
+        port: 5000
+      become: yes
