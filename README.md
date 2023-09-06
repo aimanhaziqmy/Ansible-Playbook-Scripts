@@ -25,5 +25,9 @@ Below, you will find an Ansible script for installing various applications on an
 14. NodeRed
 15. n8n.io
 16. cAdvisor (Look Prometheus - *min CPU usage 1% - 2% only)
+
 Note: There are package installations in Docker containers and also 'without-docker' for servers that are not using Docker.
+
+
+
 
