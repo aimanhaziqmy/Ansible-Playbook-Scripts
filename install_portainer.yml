@@ -1,5 +1,5 @@
 ---
-- hosts : arbatravel
+- hosts : general
   tasks :
 
   - name : Create new volume 

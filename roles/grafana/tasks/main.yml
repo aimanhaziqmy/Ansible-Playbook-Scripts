@@ -1,0 +1,14 @@
+- name: Start Grafana container
+  become: true
+  docker_container:
+    name: grafana
+    image: grafana/grafana-enterprise
+    restart_policy: unless-stopped
+    state: started
+    ports:
+      - "3000:3000"
+- name: Allow incoming connections on port 3000
+  become: true
+  ufw:
+    rule: allow
+    port: 3000

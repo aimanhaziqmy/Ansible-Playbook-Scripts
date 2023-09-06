@@ -19,18 +19,37 @@
     ports:
       - "9200:9100"
 
-- name: Copy cadvisor.yaml configuration file
-  become: true
-  template:
-    src: docker-compose.yml
-    dest: ~/Prometheus/docker-compose.yml
+- name: Pull cAdvisor image
+  docker_image:
+    name: google/cadvisor:latest
+    source: pull
 
-- name: Install and run cAdvisor using Docker
-  become: false
-  community.docker.docker_compose:
-    project_src: ~/Prometheus
-    files:
-      - docker-compose.yml
+# cAdvisor with min of 1% - 2% of CPU usage
+- name: Create cAdvisor container
+  docker_container:
+    name: cadvisor
+    image: google/cadvisor:latest
+    restart_policy: unless-stopped
+    volumes:
+      - "/:/rootfs:ro"
+      - "/var/run:/var/run:rw"
+      - "/sys:/sys:ro"
+      - "/var/lib/docker/:/var/lib/docker:ro"
+    command:
+      - '-housekeeping_interval=55s'
+      - '-docker_only=true'
+      - '--disable_metrics=disk,tcp,udp,percpu,sched,process'
+      - '-allow_dynamic_housekeeping=false'
+      - '--store_container_labels=false'
+      - '--event_storage_event_limit=default=0'
+      - '--event_storage_age_limit=default=0'
+      - '--global_housekeeping_interval=55s'
+      - '--storage_duration=1m0s'
+    security_opts:
+      - no-new-privileges:true
+    ports:
+      - "8090:8080"
+
 
 - name: Install and run Prometheus using Docker
   become: true

@@ -38,6 +38,7 @@
           LOG_CONFS: "true" # optional
         ports:
           - "51820:51820/udp"
+          - "5000:5000"
         volumes:
           - "/opt/wireguard-server/config:/config"
           - "/lib/modules:/lib/modules"
@@ -53,8 +54,6 @@
         restart_policy: unless-stopped
         cap_add: 
           - NET_ADMIN
-        ports:
-          - "5000:5000"
         env:
           SENDGRID_API_KEY: ''
           EMAIL_FROM_ADDRESS: ''

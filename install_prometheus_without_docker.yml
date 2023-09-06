@@ -1,0 +1,24 @@
+---
+- hosts: 
+  become: true
+  vars:
+    prometheus_server_ip: "{{ inventory_hostname }}"
+  roles:
+    - prometheus_without_docker
+  handlers:
+    - name: Restart Node Exporter
+      become: true
+      service:
+        name: node_exporter
+        state: restarted
+        
+    - name: Restart Prometheus
+      become: true
+      systemd:
+        name: prometheus
+        state: restarted
+
+    - name: Reload systemd
+      become: true
+      systemd:
+        daemon_reload: yes

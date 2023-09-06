@@ -1,12 +1,12 @@
 ---
-- hosts: nodocker
-  tasks:
-    - name: Install Prometheus
-      apt:
-        name: prometheus-community/ansible
-        state: present
-    - name: Start Prometheus
-      service:
-        name: prometheus-community/ansible
-        state: started
-        enabled: yes
+- hosts: Prometheus
+  become: true
+  vars:
+    prometheus_server_ip: "{{ inventory_hostname }}"
+  roles:
+    - prometheus
+  handlers:
+    - name: restart prometheus
+      systemd:
+        name: prometheus
+        state: restarted

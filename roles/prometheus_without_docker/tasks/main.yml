@@ -1,0 +1,86 @@
+- name: Install required dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - curl
+
+- name: Download Node Exporter
+  get_url:
+    url: "https://github.com/prometheus/node_exporter/releases/download/v1.2.2/node_exporter-1.2.2.linux-amd64.tar.gz"
+    dest: /tmp/node_exporter.tar.gz
+
+- name: Extract Node Exporter archive
+  become: true
+  unarchive:
+    src: /tmp/node_exporter.tar.gz
+    dest: /tmp
+    remote_src: yes
+
+- name: Move Node Exporter binary
+  become: true
+  command: mv /tmp/node_exporter-1.2.2.linux-amd64/node_exporter /usr/local/bin/
+
+- name: Create Node Exporter user
+  user:
+    name: node_exporter
+    system: yes
+    shell: /bin/false
+
+- name: Create Node Exporter service file
+  template:
+    src: node_exporter.service.j2
+    dest: /etc/systemd/system/node_exporter.service
+  notify: Restart Node Exporter
+
+- name: Download Prometheus
+  get_url:
+    url: "https://github.com/prometheus/prometheus/releases/download/v2.30.3/prometheus-2.30.3.linux-amd64.tar.gz"
+    dest: /tmp/prometheus.tar.gz
+
+- name: Extract Prometheus archive
+  become: true
+  unarchive:
+    src: /tmp/prometheus.tar.gz
+    dest: /tmp
+    remote_src: yes
+
+- name: Move Prometheus binary
+  become: true
+  command: mv /tmp/prometheus-2.30.3.linux-amd64/prometheus /usr/local/bin/
+
+- name: Move Prometheus console files
+  become: true
+  command: mv /tmp/prometheus-2.30.3.linux-amd64/consoles /etc/prometheus
+
+- name: Move Prometheus console libraries
+  become: true
+  command: mv /tmp/prometheus-2.30.3.linux-amd64/console_libraries /etc/prometheus
+
+- name: Create Prometheus user
+  user:
+    name: prometheus
+    system: yes
+    shell: /bin/false
+
+- name: Create Prometheus data directory
+  become: true
+  file:
+    path: /var/lib/prometheus
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+
+- name: Create Prometheus configuration file
+  template:
+    src: prometheus.yml.j2
+    dest: /etc/prometheus/prometheus.yml
+  notify: Restart Prometheus
+
+- name: Create Prometheus service file
+  template:
+    src: prometheus.service.j2
+    dest: /etc/systemd/system/prometheus.service
+  notify: Reload systemd
+

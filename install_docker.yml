@@ -1,5 +1,5 @@
 ---
-- hosts : arbatravel
+- hosts : 
   become : yes
   tasks :
 
