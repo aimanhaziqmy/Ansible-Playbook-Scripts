@@ -18,3 +18,7 @@ Included installation for ubuntu server 20.04 :
 13. OpenWhisk
 14. NodeRed
 15. n8n.io
+
+```
+ansible-playbook -i inventory <playbook-name>.yml 
+```
