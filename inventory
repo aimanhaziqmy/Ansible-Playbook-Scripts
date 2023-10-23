@@ -13,9 +13,6 @@
 [nodocker]
 172.104.34.239 ansible_ssh_user='root'
 
-[arbatravel]
-139.144.117.220 ansible_ssh_user='root'
-
 [general]
 69.197.188.219 ansible_ssh_user='root'
 
