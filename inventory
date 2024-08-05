@@ -17,6 +17,6 @@
 69.197.188.219 ansible_ssh_user='root'
 
 [jenkins-installation]
-${JENKINS_IP} ansible_ssh_user=${JENKINS_USER}
+${ip_address} ansible_ssh_user=${username} ansible_ssh_pass=${password}
 
 
