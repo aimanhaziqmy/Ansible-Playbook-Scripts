@@ -1,30 +1,132 @@
 ---
-- hosts : 
-  become : yes
+- name : Install Docker
+  hosts : jenkins-installation
+  become : true
   tasks :
+  # For Ubuntu or Debian distributions
+    - name: install docker dependencies (Ubuntu/Debian)
+      apt:
+        name: "{{item}}"
+        state: present
+      with_items:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg-agent
+        - software-properties-common
+      when: ansible_distribution in ["Ubuntu", "Debian"]
 
-  # Install Docker
-  # --
-  #
-  - name : install prerequisites
-    apt :
-     name :
-       - docker.io
-     update_cache : yes
+    - name: add GPG key (Ubuntu/Debian)
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+      when: ansible_distribution in ["Ubuntu", "Debian"]
 
-  - name : add user permissions
-    shell : "usermod -aG docker {{ ansible_env.SUDO_USER }}"
+    - name: add docker repository to apt (Ubuntu/Debian)
+      apt_repository:
+        repo: "deb https://download.docker.com/linux/ubuntu {{ ubuntu_code }} stable"
+        state: present
+      when: ansible_distribution in ["Ubuntu", "Debian"]
 
-  - name : Reset ssh connection for changes to take effect
-    meta : "reset_connection"
+    - name: install docker dependencies (Ubuntu/Debian)
+      apt:
+        name: "{{item}}"
+        state: latest
+        update_cache: yes
+      loop:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+      when: ansible_distribution in ["Ubuntu", "Debian"]
 
-  - name : install python package manager
-    apt : 
-     name : python3-pip
+  # For AlmaLinux distribution
+    - name: dnf upgrade (AlmaLinux/Redhat/CentOS)
+      command: dnf upgrade -y
+      when: ansible_os_family == "RedHat"
 
-  - name : install python sdk
-    become_user : "{{ ansible_env.SUDO_USER }}"
-    pip :
-     name : 
-       - docker
-       - docker-compose
+    - name: Install required packages (AlmaLinux/Redhat/CentOS)
+      dnf:
+        name: "{{ item }}"
+        state: latest
+      with_items:
+        - dnf-utils
+        - device-mapper-persistent-data
+        - lvm2
+      when: ansible_os_family == "RedHat"
+
+    - name: Add official Docker GPG key (AlmaLinux/Redhat/CentOS)
+      rpm_key:
+        key: "https://download.docker.com/linux/centos/gpg"
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Add Docker repo (AlmaLinux/Redhat/CentOS)
+      get_url:
+        url: "https://download.docker.com/linux/centos/docker-ce.repo"
+        dest: /etc/yum.repos.d/docer-ce.repo
+      become: yes
+      when: ansible_os_family == "RedHat"
+
+    - name: Enable Docker  Edge & Test repo (AlmaLinux/Redhat/CentOS)
+      ini_file:
+        dest: /etc/yum.repos.d/docer-ce.repo
+        section: "{{ item }}"
+        option:  enabled
+        value: 0
+      with_items: ['docker-ce-test', 'docker-ce-edge']
+      when: ansible_os_family == "RedHat"
+
+    - name: Install Docker (AlmaLinux/Redhat/CentOS)
+      package:
+        name: docker-ce
+        state: latest
+      become: yes
+      when: ansible_os_family == "RedHat"
+
+  # Add docker
+    - name: check docker is active and enabled
+      service:
+        name: docker
+        state: started
+        enabled: yes
+    - name: Ensure group "docker" exists
+      ansible.builtin.group:
+        name: docker
+        state: present
+    - name: adding current user to docker group
+      user:
+        name: "{{ ansible_ssh_user }}"
+        groups: docker
+        append: yes
+
+  ##### setup ansible <---> docker
+    - name: install python3-pip (via apt)
+      apt:
+        name: "{{item}}"
+        state: present
+      with_items:
+        - python3-pip
+        - python-is-python3
+      when: ansible_distribution in ["Ubuntu", "Debian"]
+
+    - name: install python3-pip (via dnf)
+      dnf:
+        name: "{{item}}"
+        state: present
+      with_items:
+        - python3-pip
+      when: ansible_os_family == "RedHat"
+
+    - name: install docker api for python3
+      pip:
+        name: docker
+    - name: Install docker-compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: 'u+x,g+x'
+    - name: Change file ownership, group and permissions
+      ansible.builtin.file:
+        path: /usr/local/bin/docker-compose
+        owner: "{{ ansible_ssh_user }}"
+        group: "{{ ansible_ssh_user }}"
