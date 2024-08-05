@@ -3,9 +3,9 @@
   become: true
   vars:
     prometheus_server_ip: "{{ ip_address }}"
-    ip_address: "{{ ip_address }}"
-    username: "{{ username }}"
-    password: "{{ password }}"
+    ansible_ssh_host: "{{ ip_address }}"
+    ansible_ssh_user: "{{ username }}"
+    ansible_ssh_pass: "{{ password }}"
   roles:
     - prometheus
   handlers:

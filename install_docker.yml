@@ -3,9 +3,9 @@
   hosts : jenkins-installation
   become : true
   vars:
-    ip_address: "{{ ip_address }}"
-    username: "{{ username }}"
-    password: "{{ password }}"
+    ansible_ssh_host: "{{ ip_address }}"
+    ansible_ssh_user: "{{ username }}"
+    ansible_ssh_pass: "{{ password }}"
   tasks :
   # For Ubuntu or Debian distributions
     - name: install docker dependencies (Ubuntu/Debian)
