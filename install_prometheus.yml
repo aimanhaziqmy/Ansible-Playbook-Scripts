@@ -2,7 +2,10 @@
 - hosts: jenkins-installation
   become: true
   vars:
-    prometheus_server_ip: "{{ inventory_hostname }}"
+    prometheus_server_ip: "{{ ip_address }}"
+    ip_address: "{{ ip_address }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
   roles:
     - prometheus
   handlers:

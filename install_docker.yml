@@ -2,6 +2,10 @@
 - name : Install Docker
   hosts : jenkins-installation
   become : true
+  vars:
+    ip_address: "{{ ip_address }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
   tasks :
   # For Ubuntu or Debian distributions
     - name: install docker dependencies (Ubuntu/Debian)
