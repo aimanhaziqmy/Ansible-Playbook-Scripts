@@ -1,5 +1,5 @@
 ---
-- hosts: Prometheus
+- hosts: jenkins-installation
   become: true
   vars:
     prometheus_server_ip: "{{ inventory_hostname }}"
