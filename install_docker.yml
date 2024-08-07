@@ -6,7 +6,7 @@
     ansible_ssh_host: "{{ ip_address }}"
     ansible_ssh_user: "{{ username }}"
     ansible_ssh_pass: "{{ password }}"
-    ansible_ssh_port: "{{ port | | default(22) }}"
+    ansible_ssh_port: "{{ port | default(22) }}"
     ubuntu_code: "{{ ubuntu_code }}"
   tasks :
   # For Ubuntu or Debian distributions
