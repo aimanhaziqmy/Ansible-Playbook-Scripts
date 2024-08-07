@@ -2,7 +2,7 @@
 139.177.184.167 ansible_ssh_user='root'
 
 [Prometheus]
-139.177.184.167 ansible_ssh_user='root' prometheus_server_ip='139.177.184.167'
+139.139.177.184.167 ansible_ssh_user='root' prometheus_server_ip=${prometheus_server_ip}
 
 [grafana]
 139.177.184.167 ansible_ssh_user='root'
@@ -17,6 +17,4 @@
 69.197.188.219 ansible_ssh_user='root'
 
 [jenkins-installation]
-dummy_host
-
-
+${ip_address} ansible_ssh_user=${username} ansible_ssh_pass=${password} ansible_become_pass=${jenkins_server_password}  ubuntu_code=${ubuntu_code} ansible_ssh_port=6262
