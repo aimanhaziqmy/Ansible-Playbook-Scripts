@@ -2,12 +2,15 @@
 - name : Install Docker
   hosts : jenkins-installation
   become : true
+  become_method: sudo
+  become_user: root
   vars:
     ansible_ssh_host: "{{ ip_address }}"
     ansible_ssh_user: "{{ username }}"
     ansible_ssh_pass: "{{ password }}"
-    ansible_ssh_port: 6262
+    ansible_ssh_port: "{{ ssh_port}}"
     ubuntu_code: "{{ ubuntu_code }}"
+    become_password: "{{ sudo_password }}"
   tasks :
   # For Ubuntu or Debian distributions
     - name: install docker dependencies (Ubuntu/Debian)
